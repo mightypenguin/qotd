@@ -86,7 +86,7 @@ if sc.rtm_connect():
         #print messages
         for message in messages:
         	#print message
-        	if all(k in message for k in ('type','text')) and message['type'] == 'message' and 'bot_id' not in message and (botuid in message['text'] or 'lol' in message['text']):
+        	if all(k in message for k in ('type','text')) and message['type'] == 'message' and 'bot_id' not in message and any(j in message['text'] for j in (botuid,'lol')):
         		print message
         		sendReply(message['channel'], message)
         time.sleep(1)
