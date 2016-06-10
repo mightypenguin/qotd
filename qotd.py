@@ -1,23 +1,19 @@
 #!/usr/bin/python
 # Licensed under the terms of the MIT License
 
-# Setup
-# 	pip install slackclient
-# Copy your slack bot token into bot_token.txt
-# Create quotes.csv file.
-
-# Starting:
-# python qotd.py
-
-# Add bot to a channel by inviting it once you authorize the bot for your slack group.
-
 import time
 import datetime
 import random
 from slackclient import SlackClient
 
-token = ""
-botuid = '<@U1F54AWA3>: ' #  @qotd:
+token   = "UNDEFINED"
+botname = "UNDEFINED"
+botuid  = "UNDEFINED"
+
+b = open('bot_id.txt','r') # should contain 'botusername,UID1234'
+(botname, botuid) = b.read().split(',')
+b.close()
+botuid = '<@' + botuid + '>: '
 
 t = open('bot_token.txt','r')
 token = t.read()
