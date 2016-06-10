@@ -22,4 +22,4 @@
 ### Tech
 
 * python
-* slackbot
+* slackbot (https://github.com/slackhq/python-slackclient)
