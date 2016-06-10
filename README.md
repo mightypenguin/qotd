@@ -9,8 +9,9 @@
 Add bot to a channel by inviting it once you authorize the bot for your slack group.
 
 ### Usage:
-  @qotd: help
-  @qotd: quote
+  * @qotd: help
+  * @qotd: quote
+  
       or a message contains "lol", print out a random quote.
 
 ### Version
