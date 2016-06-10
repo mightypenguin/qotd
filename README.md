@@ -11,8 +11,8 @@
  python qotd.py
 
 ### Usage:
-  * @qotd: help
-  * @qotd: quote
+  * @botname: help
+  * @botname: quote
   
       or a message contains "lol", print out a random quote.
 
