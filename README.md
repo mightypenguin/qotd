@@ -1,6 +1,7 @@
 ### Setup
 * Setup bot account (https://nasa.slack.com/apps/new/A0F7YS25R-bots)
-* Creat API token (https://get.slack.help/hc/en-us/articles/215770388-Creating-and-regenerating-API-tokens)
+* Create API token (https://get.slack.help/hc/en-us/articles/215770388-Creating-and-regenerating-API-tokens)
+* Update bot_uid.txt file to include your new bot "botname,BOTUID1234".
 * run: pip install slackclient
 * Copy your slack bot token into bot_token.txt
 * Create quotes.csv file. ( Delimited with ||| )
