@@ -2,21 +2,18 @@
 # Licensed under the terms of the MIT License
 
 import time
+import json
 import datetime
 import random
 from slackclient import SlackClient
 
-token   = "UNDEFINED"
-botname = "UNDEFINED"
-botuid  = "UNDEFINED"
+s = None
 
-b = open('bot_id.txt','r') # should contain 'botusername,UID1234'
-(botname, botuid) = b.read().split(',')
-b.close()
-botuid = '<@' + botuid + '>: '
+sFile = open('settings.json')
+s = json.load(sFile)
+sFile.close()
 
-t = open('bot_token.txt','r')
-token = t.read()
+botcheck = '<@' + s['bot']['id'] + '>: '
 
 f = open('quotes.csv','r')
 quotes = []
@@ -35,8 +32,8 @@ f.close()
 #*bold* `code` _italic_ ~strike~
 
 def addQuote(chan, msg):
-	l = len(botuid) + 4
-	q = msg['text'][l:].replace('"','')
+	l = len(s["bot"]["id"]) + 4
+	q = msg['text'][l:].replace('"','').replace('|||',' ')
 	f = open('quotes.csv','a')
 	f.write("\n" + q + '|||' + msg['user'] + '|||' + str(datetime.datetime.utcnow()))
 	f.close()
@@ -56,11 +53,11 @@ def help(chan, msg):
 	print sc.api_call('chat.postMessage', as_user='true', channel=chan, text=helptext + '.\n\t' + str(len(quotes)) + ' total quotes.')
 
 commands = [
-#{'command':botuid+'are you alive', 'response':'_*Yes, I\'m ALLLIIIVE*_'},
-{'command':botuid+'quote', 'action':printQuote, 	'help':botuid+'quote [prints random quote], or by "lol"' },
-{'command':botuid+'add',   'action':addQuote, 		'help':botuid+'add <some witty quote I want to add>' },
-{'command':botuid+'list',  'action':listQuotes, 	'help':botuid+'list [prints out all quotes]' },
-{'command':botuid+'help',  'action':help, 			'help':botuid+'help [this help text]'}
+#{'command':s["bot"]["id"]+'are you alive', 'response':'_*Yes, I\'m ALLLIIIVE*_'},
+{'command':botcheck+'quote', 'action':printQuote, 	'help':botcheck+'quote [prints random quote], or by "lol"' },
+{'command':botcheck+'add',   'action':addQuote, 		'help':botcheck+'add <some witty quote I want to add>' },
+{'command':botcheck+'list',  'action':listQuotes, 	'help':botcheck+'list [prints out all quotes]' },
+{'command':botcheck+'help',  'action':help, 			  'help':botcheck+'help [this help text]'}
 ]
 
 helptext = 'Greetings traveler! Commands are:\n'
@@ -78,7 +75,7 @@ def sendReply(chan, msg):
 		if command['command'] in msg['text']:
 			command['action'](chan, msg)
 
-sc = SlackClient(token)
+sc = SlackClient(s["token"])
 
 if sc.rtm_connect():
     while True:
@@ -86,7 +83,7 @@ if sc.rtm_connect():
         #print messages
         for message in messages:
         	#print message
-        	if all(k in message for k in ('type','text')) and message['type'] == 'message' and 'bot_id' not in message and any(j in message['text'] for j in (botuid,'lol')):
+        	if all(k in message for k in ('type','text')) and message['type'] == 'message' and 'bot_id' not in message and any(j in message['text'] for j in (botcheck,'lol')):
         		print message
         		sendReply(message['channel'], message)
         time.sleep(1)
