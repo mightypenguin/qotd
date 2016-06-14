@@ -2,10 +2,13 @@
 # Licensed under the terms of the MIT License
 
 import time
+import logging
 import json
 import datetime
 import random
 from slackclient import SlackClient
+
+logging.basicConfig(format='%(levelname)s:%(message)s', level=logging.INFO)
 
 s = None
 
@@ -38,19 +41,23 @@ def addQuote(chan, msg):
 	f.write("\n" + q + '|||' + msg['user'] + '|||' + str(datetime.datetime.utcnow()))
 	f.close()
 	quotes.append(q)
-	print sc.api_call('chat.postMessage', as_user='true', channel=chan, text='\t_*"' + q + '"*_\n\tQuote added. High Five <@' + msg['user'] + '>!')
+	output = sc.api_call('chat.postMessage', as_user='true', channel=chan, text='\t_*"' + q + '"*_\n\tQuote added. High Five <@' + msg['user'] + '>!')
+	logging.debug(output)
 
 def printQuote(chan, msg):
-	print sc.api_call('chat.postMessage', as_user='true', channel=chan, text='\t' + random.choice(attributions) + ':\n\t\t_*"' + random.choice(quotes) + '"*_')
+	output = sc.api_call('chat.postMessage', as_user='true', channel=chan, text='\t' + random.choice(attributions) + ':\n\t\t_*"' + random.choice(quotes) + '"*_')
+	logging.debug(output)
 
 def listQuotes(chan, msg):
 	mylist = '';
 	for q in quotes:
 		mylist += '\t_*' + q + '*_\n'
-	print sc.api_call('chat.postMessage', as_user='true', channel=chan, text='\t' + mylist + '\n\n\t' + str(len(quotes)) + ' total quotes.')
+	output = sc.api_call('chat.postMessage', as_user='true', channel=chan, text='\t' + mylist + '\n\n\t' + str(len(quotes)) + ' total quotes.')
+	logging.debug(output)
 
 def help(chan, msg):
-	print sc.api_call('chat.postMessage', as_user='true', channel=chan, text=helptext + '\n\t' + str(len(quotes)) + ' total quotes.')
+	output = sc.api_call('chat.postMessage', as_user='true', channel=chan, text=helptext + '\n\t' + str(len(quotes)) + ' total quotes.')
+	logging.debug(output)
 
 commands = [
 #{'command':s["bot"]["id"]+'are you alive', 'response':'_*Yes, I\'m ALLLIIIVE*_'},
@@ -77,16 +84,18 @@ def sendReply(chan, msg):
 
 sc = SlackClient(s["token"])
 
+logging.info("Connecting as " + s["bot"]["name"])
 if sc.rtm_connect():
-    while True:
-        messages = sc.rtm_read()
-        #print messages
-        for message in messages:
-        	#print message
-        	if all(k in message for k in ('type','text')) and message['type'] == 'message' and 'bot_id' not in message and any(j in message['text'] for j in (botcheck,'lol')):
-        		print message
-        		sendReply(message['channel'], message)
-        time.sleep(1)
+	logging.info("...Connected!")
+	while True:
+		messages = sc.rtm_read()
+		#logging.debug(messages)
+		for message in messages:
+			#print message
+			if all(k in message for k in ('type','text')) and message['type'] == 'message' and 'bot_id' not in message and any(j in message['text'] for j in (botcheck,'lol')):
+				logging.debug(message)
+				sendReply(message['channel'], message)
+		time.sleep(1)
 else:
     print "Connection Failed, invalid token?"
     
