@@ -50,7 +50,7 @@ def listQuotes(chan, msg):
 	print sc.api_call('chat.postMessage', as_user='true', channel=chan, text='\t' + mylist + '\n\n\t' + str(len(quotes)) + ' total quotes.')
 
 def help(chan, msg):
-	print sc.api_call('chat.postMessage', as_user='true', channel=chan, text=helptext + '.\n\t' + str(len(quotes)) + ' total quotes.')
+	print sc.api_call('chat.postMessage', as_user='true', channel=chan, text=helptext + '\n\t' + str(len(quotes)) + ' total quotes.')
 
 commands = [
 #{'command':s["bot"]["id"]+'are you alive', 'response':'_*Yes, I\'m ALLLIIIVE*_'},
@@ -62,7 +62,7 @@ commands = [
 
 helptext = 'Greetings traveler! Commands are:\n'
 for c in commands:
-	helptext += "\t'" + c['help'] + "'\n"
+	helptext += "\t" + c['help'] + "\n"
 commands[len(commands)-1]['response'] = helptext
 
 
