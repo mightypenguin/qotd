@@ -5,7 +5,7 @@
 * Add bot username and id to settings.json
 * Add bot to a channel by inviting it once you authorize the bot for your slack group.
 * run: pip install slackclient
-* Create quotes.csv file. ( Delimited with ||| )
+* Create quotes.json file.
 
 ### Starting:
  python qotd.py
