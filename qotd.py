@@ -18,10 +18,10 @@ sFile.close()
 
 botcheck = '<@' + s['bot']['id'] + '>: '
 
-f = open('quotes.csv','r')
+f = open('quotes.json','r')
 quotes = []
 for line in f:
-	quotes.append( line.split('|||')[0] )
+	quotes.append( json.loads(line) )
 f.close()	
 
 f = open('attributions.csv','r')
@@ -36,16 +36,21 @@ f.close()
 
 def addQuote(chan, msg):
 	l = len(s["bot"]["id"]) + 4
-	q = msg['text'][l:].replace('"','').replace('|||',' ')
-	f = open('quotes.csv','a')
-	f.write("\n" + q + '|||' + msg['user'] + '|||' + str(datetime.datetime.utcnow()))
+	q = {}
+	q["quote"] = msg['text'][l:].replace('"','')
+	q["user"]  = msg['user']
+	q["time"]  = str(datetime.datetime.utcnow())
+
+	f = open('quotes.json','a')
+	f.write("\n" + json.dumps(q))
 	f.close()
+	
 	quotes.append(q)
 	output = sc.api_call('chat.postMessage', as_user='true', channel=chan, text='\t_*"' + q + '"*_\n\tQuote added. High Five <@' + msg['user'] + '>!')
 	logging.debug(output)
 
 def printQuote(chan, msg):
-	output = sc.api_call('chat.postMessage', as_user='true', channel=chan, text='\t' + random.choice(attributions) + ':\n\t\t_*"' + random.choice(quotes) + '"*_')
+	output = sc.api_call('chat.postMessage', as_user='true', channel=chan, text='\t' + random.choice(attributions) + ':\n\t\t_*"' + random.choice(quotes)["quote"] + '"*_')
 	logging.debug(output)
 
 def listQuotes(chan, msg):
