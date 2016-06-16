@@ -1,5 +1,9 @@
 #!/usr/bin/python
+# -*- coding: utf-8 -*-
+
 # Licensed under the terms of the MIT License
+from __future__ import unicode_literals
+
 
 import time
 import logging
@@ -35,9 +39,10 @@ f.close()
 #*bold* `code` _italic_ ~strike~
 
 def addQuote(chan, msg):
-	l = len(s["bot"]["id"]) + 4
+	l = len(botcheck) + 4
 	q = {}
-	q["quote"] = msg['text'][l:].replace('"','')
+	q["quote"] = msg['text'][l:].strip('"“')
+	logging.info('Quote is: ' + q["quote"])
 	q["user"]  = msg['user']
 	q["time"]  = str(datetime.datetime.utcnow())
 
@@ -46,7 +51,7 @@ def addQuote(chan, msg):
 	f.close()
 	
 	quotes.append(q)
-	output = sc.api_call('chat.postMessage', as_user='true', channel=chan, text='\t_*"' + q + '"*_\n\tQuote added. High Five <@' + msg['user'] + '>!')
+	output = sc.api_call('chat.postMessage', as_user='true', channel=chan, text='\t_*"' + q["quote"] + '"*_\n\tQuote added. High Five <@' + msg['user'] + '>!')
 	logging.debug(output)
 
 def printQuote(chan, msg):
@@ -54,10 +59,10 @@ def printQuote(chan, msg):
 	logging.debug(output)
 
 def listQuotes(chan, msg):
-	mylist = '';
+	mylist = 'Quotes:\n';
 	for q in quotes:
-		mylist += '\t_*' + q + '*_\n'
-	output = sc.api_call('chat.postMessage', as_user='true', channel=chan, text='\t' + mylist + '\n\n\t' + str(len(quotes)) + ' total quotes.')
+		mylist += '\t_*' + q["quote"] + '*_\n'
+	output = sc.api_call('chat.postMessage', as_user='true', channel=chan, text=mylist + '\n\n\t' + str(len(quotes)) + ' total quotes.')
 	logging.debug(output)
 
 def help(chan, msg):
