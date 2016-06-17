@@ -1,2 +1,5 @@
 bot_token.txt
-quotes.csv
+bot_id.txt
+quotes.json
+settings.json
+*.swp
