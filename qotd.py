@@ -1,42 +1,52 @@
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
-
 # Licensed under the terms of the MIT License
+from __future__ import division
 from __future__ import unicode_literals
-
 
 import time
 import logging
 import json
 import datetime
 import random
+
 from slackclient import SlackClient
 
 logging.basicConfig(format='%(levelname)s:%(message)s', level=logging.INFO)
 
-s = None
+with file('settings.json', 'r') as settingsfile:
+	s = json.load(settingsfile)
 
-sFile = open('settings.json')
-s = json.load(sFile)
-sFile.close()
+with file('quotes.json', 'r') as quotesfile:
+  quotes = [json.loads(line) for line in quotesfile.readlines()]
+
+with file('attributions.csv', 'r') as attributionsfile:
+  attributions = [line.strip() for line in attributionsfile.readlines()]
 
 botcheck = '<@' + s['bot']['id'] + '>: '
 
-f = open('quotes.json','r')
-quotes = []
-for line in f:
-	quotes.append( json.loads(line) )
-f.close()	
-
-f = open('attributions.csv','r')
-attributions = []
-for line in f:
-	attributions.append( line.replace('\n','') )
-f.close()	
-
-
 #Slack formatting
 #*bold* `code` _italic_ ~strike~
+
+def get_bot_id():
+	api_call = sc.api_call("users.list")
+	if api_call.get('ok'):
+		# retrieve all users so we can find our bot
+		users = api_call.get('members')
+		for user in users:
+			if 'name' in user and user.get('name') == s["bot"]["name"]:
+				s["bot"]["id"] = user.get('id')
+				botcheck = '<@' + s['bot']['id'] + '>: '
+				return ({ user['name']:user.get('id') })
+	else:
+		return "could not find bot user with the name " + s["bot"]["name"]
+
+def autoping(last):
+	### hardcode the interval to 3 seconds
+	now = int(time.time())
+	if last + 3 < now:
+		sc.server.ping()
+	return now
 
 def addQuote(chan, msg):
 	l = len(botcheck) + 4
@@ -51,22 +61,26 @@ def addQuote(chan, msg):
 	f.close()
 	
 	quotes.append(q)
-	output = sc.api_call('chat.postMessage', as_user='true', channel=chan, text='\t_*"' + q["quote"] + '"*_\n\tQuote added. High Five <@' + msg['user'] + '>!')
+	output = sc.api_call('chat.postMessage', as_user='true', channel=chan, 
+											text='\t_*"' + q["quote"] + '"*_\n\tQuote added. High Five <@' + msg['user'] + '>!')
 	logging.debug(output)
 
 def printQuote(chan, msg):
-	output = sc.api_call('chat.postMessage', as_user='true', channel=chan, text='\t' + random.choice(attributions) + ':\n\t\t_*"' + random.choice(quotes)["quote"] + '"*_')
+	output = sc.api_call('chat.postMessage', as_user='true', channel=chan, 
+						text='\t' + random.choice(attributions) + ':\n\t\t_*"' + random.choice(quotes)["quote"] + '"*_')
 	logging.debug(output)
 
 def listQuotes(chan, msg):
 	mylist = 'Quotes:\n';
 	for q in quotes:
 		mylist += '\t_*' + q["quote"] + '*_\n'
-	output = sc.api_call('chat.postMessage', as_user='true', channel=chan, text=mylist + '\n\n\t' + str(len(quotes)) + ' total quotes.')
+	output = sc.api_call('chat.postMessage', as_user='true', channel=chan, 
+											text=mylist + '\n\n\t' + str(len(quotes)) + ' total quotes.')
 	logging.debug(output)
 
 def help(chan, msg):
-	output = sc.api_call('chat.postMessage', as_user='true', channel=chan, text=helptext + '\n\t' + str(len(quotes)) + ' total quotes.')
+	output = sc.api_call('chat.postMessage', as_user='true', channel=chan, 
+											text=helptext + '\n\t' + str(len(quotes)) + ' total quotes.')
 	logging.debug(output)
 
 commands = [
@@ -83,6 +97,13 @@ for c in commands:
 commands[len(commands)-1]['response'] = helptext
 
 
+"""{   u'channel': u'G1FS1CJ84',
+    u'team': u'T05311JTT',
+    u'text': u'<@U1FRJ3WMU>: lol',
+    u'ts': u'1465583194.000034',
+    u'type': u'message',
+    u'user': u'U0LJ6Q4S0'}"""   ### Typical structure of a command packet
+
 def sendReply(chan, msg):
 	if 'lol' in msg['text']:
 		commands[0]['action'](chan, msg)
@@ -97,15 +118,20 @@ sc = SlackClient(s["token"])
 logging.info("Connecting as " + s["bot"]["name"])
 if sc.rtm_connect():
 	logging.info("...Connected!")
+	logging.debug( get_bot_id() )
+	last_ping = int(time.time())
 	while True:
 		messages = sc.rtm_read()
 		#logging.debug(messages)
+		last_ping = autoping(last_ping)
 		for message in messages:
-			#print message
-			if all(k in message for k in ('type','text')) and message['type'] == 'message' and 'bot_id' not in message and any(j in message['text'] for j in (botcheck,'lol')):
+			if all(k in message for k in ('type','text')) \
+						and message['type'] == 'message' \
+						and 'bot_id' not in message \
+						and any(j in message['text'] for j in (botcheck,'lol')):
 				logging.debug(message)
 				sendReply(message['channel'], message)
 		time.sleep(1)
 else:
-    print "Connection Failed, invalid token?"
+    logging.info("Connection Failed, invalid token?")
     
