@@ -13,8 +13,9 @@
 ### Usage:
   * @botname: help
   * @botname: quote
-  
+
       or a message contains "lol", print out a random quote.
+Add bot to a channel by inviting it once you authorize the bot for your slack group.
 
 ### Version
 0.0.1
