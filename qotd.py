@@ -83,18 +83,18 @@ def help(chan, msg):
 											text=helptext + '\n\t' + str(len(quotes)) + ' total quotes.')
 	logging.debug(output)
 
-commands = [
+commands = {
 #{'command':s["bot"]["id"]+'are you alive', 'response':'_*Yes, I\'m ALLLIIIVE*_'},
-{'command':botcheck+'quote', 'action':printQuote, 	'help':botcheck+'quote [prints random quote], or by "lol"' },
-{'command':botcheck+'add',   'action':addQuote, 		'help':botcheck+'add <some witty quote I want to add>' },
-{'command':botcheck+'list',  'action':listQuotes, 	'help':botcheck+'list [prints out all quotes]' },
-{'command':botcheck+'help',  'action':help, 			  'help':botcheck+'help [this help text]'}
-]
+'quote':{ 'action':printQuote, 	'help':'quote [prints random quote], or by "lol"' },
+'add':  { 'action':addQuote, 		'help':'add <some witty quote I want to add>' },
+'list': { 'action':listQuotes, 	'help':'list [prints out all quotes]' },
+'help': { 'action':help, 			  'help':'help [this help text]' }
+}
 
 helptext = 'Greetings traveler! Commands are:\n'
 for c in commands:
-	helptext += "\t" + c['help'] + "\n"
-commands[len(commands)-1]['response'] = helptext
+	helptext += "\t" + botcheck + commands[c]['help'] + "\n"
+commands['help']['response'] = helptext
 
 
 """{   u'channel': u'G1FS1CJ84',
@@ -105,13 +105,23 @@ commands[len(commands)-1]['response'] = helptext
     u'user': u'U0LJ6Q4S0'}"""   ### Typical structure of a command packet
 
 def sendReply(chan, msg):
-	if 'lol' in msg['text']:
-		commands[0]['action'](chan, msg)
+  text = msg['text']
+
+  if 'lol' in text:
+		commands['quote']['action'](chan, msg)
 		return
-		
-	for command in commands:
-		if command['command'] in msg['text']:
-			command['action'](chan, msg)
+
+  text = text[len(botcheck):]
+  pos = len(text)
+  try:
+    pos = text.index(' ')
+  except ValueError:
+    pass
+
+  cmd = text[:pos] # grab command string up to first space
+  logging.info('cmd ="' + cmd + '"')
+  if cmd in commands:
+    commands[cmd]['action'](chan, msg)
 
 sc = SlackClient(s["token"])
 
