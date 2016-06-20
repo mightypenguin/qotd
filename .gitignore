@@ -3,3 +3,4 @@ bot_id.txt
 quotes.json
 settings.json
 *.swp
+*.pyc
