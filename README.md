@@ -21,7 +21,7 @@
 
 ### Tech
 
-* python
+* python v2.7.10 (tested)
 * slackclient (https://github.com/slackhq/python-slackclient)
 
 ### Contributors
