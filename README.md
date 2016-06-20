@@ -12,9 +12,11 @@
 
 ### Usage:
   * @botname: help
+  * @botname: list
+  * @botname: add
   * @botname: quote
   
-      or a message contains "lol", print out a random quote.
+      print out a random quote.
 
 ### Version
 0.0.1
