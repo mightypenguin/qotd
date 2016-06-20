@@ -18,10 +18,10 @@ with file('settings.json', 'r') as settingsfile:
 	s = json.load(settingsfile)
 
 with file('quotes.json', 'r') as quotesfile:
-  quotes = [json.loads(line) for line in quotesfile.readlines()]
+	quotes = [json.loads(line) for line in quotesfile.readlines()]
 
 with file('attributions.csv', 'r') as attributionsfile:
-  attributions = [line.strip() for line in attributionsfile.readlines()]
+	attributions = [line.strip() for line in attributionsfile.readlines()]
 
 botcheck = '<@' + s['bot']['id'] + '>: '
 
@@ -53,8 +53,8 @@ def addQuote(chan, msg):
 	q = {}
 	q["quote"] = msg['text'][l:].strip('"“')
 	logging.info('Quote is: ' + q["quote"])
-	q["user"]  = msg['user']
-	q["time"]  = str(datetime.datetime.utcnow())
+	q["user"]	= msg['user']
+	q["time"]	= str(datetime.datetime.utcnow())
 
 	f = open('quotes.json','a')
 	f.write("\n" + json.dumps(q))
@@ -62,7 +62,7 @@ def addQuote(chan, msg):
 	
 	quotes.append(q)
 	output = sc.api_call('chat.postMessage', as_user='true', channel=chan, 
-											text='\t_*"' + q["quote"] + '"*_\n\tQuote added. High Five <@' + msg['user'] + '>!')
+						text='\t_*"' + q["quote"] + '"*_\n\tQuote added. High Five <@' + msg['user'] + '>!')
 	logging.debug(output)
 
 def printQuote(chan, msg):
@@ -75,20 +75,20 @@ def listQuotes(chan, msg):
 	for q in quotes:
 		mylist += '\t_*' + q["quote"] + '*_\n'
 	output = sc.api_call('chat.postMessage', as_user='true', channel=chan, 
-											text=mylist + '\n\n\t' + str(len(quotes)) + ' total quotes.')
+						text=mylist + '\n\n\t' + str(len(quotes)) + ' total quotes.')
 	logging.debug(output)
 
 def help(chan, msg):
 	output = sc.api_call('chat.postMessage', as_user='true', channel=chan, 
-											text=helptext + '\n\t' + str(len(quotes)) + ' total quotes.')
+						text=helptext + '\n\t' + str(len(quotes)) + ' total quotes.')
 	logging.debug(output)
 
 commands = {
-#{'command':s["bot"]["id"]+'are you alive', 'response':'_*Yes, I\'m ALLLIIIVE*_'},
-'quote':{ 'action':printQuote, 	'help':'quote [prints random quote], or by "lol"' },
-'add':  { 'action':addQuote, 		'help':'add <some witty quote I want to add>' },
-'list': { 'action':listQuotes, 	'help':'list [prints out all quotes]' },
-'help': { 'action':help, 			  'help':'help [this help text]' }
+	#{'command':s["bot"]["id"]+'are you alive', 'response':'_*Yes, I\'m ALLLIIIVE*_'},
+	'quote':{ 'action':printQuote, 	'help':'quote [prints random quote], or by "lol"' },
+	'add':	{ 'action':addQuote, 	'help':'add <some witty quote I want to add>' },
+	'list': { 'action':listQuotes, 	'help':'list [prints out all quotes]' },
+	'help': { 'action':help, 		'help':'help [this help text]' }
 }
 
 helptext = 'Greetings traveler! Commands are:\n'
@@ -97,31 +97,31 @@ for c in commands:
 commands['help']['response'] = helptext
 
 
-"""{   u'channel': u'G1FS1CJ84',
-    u'team': u'T05311JTT',
-    u'text': u'<@U1FRJ3WMU>: lol',
-    u'ts': u'1465583194.000034',
-    u'type': u'message',
-    u'user': u'U0LJ6Q4S0'}"""   ### Typical structure of a command packet
+"""{	 u'channel': u'G1FS1CJ84',
+	u'team': u'T05311JTT',
+	u'text': u'<@U1FRJ3WMU>: lol',
+	u'ts': u'1465583194.000034',
+	u'type': u'message',
+	u'user': u'U0LJ6Q4S0'}"""	 ### Typical structure of a command packet
 
 def sendReply(chan, msg):
-  text = msg['text']
+	text = msg['text']
 
-  if 'lol' in text:
+	if 'lol' in text:
 		commands['quote']['action'](chan, msg)
 		return
 
-  text = text[len(botcheck):]
-  pos = len(text)
-  try:
-    pos = text.index(' ')
-  except ValueError:
-    pass
+	text = text[len(botcheck):]
+	pos = len(text)
+	try:
+		pos = text.index(' ')
+	except ValueError:
+		pass
 
-  cmd = text[:pos] # grab command string up to first space
-  logging.info('cmd ="' + cmd + '"')
-  if cmd in commands:
-    commands[cmd]['action'](chan, msg)
+	cmd = text[:pos] # grab command string up to first space
+	logging.info('cmd ="' + cmd + '"')
+	if cmd in commands:
+		commands[cmd]['action'](chan, msg)
 
 sc = SlackClient(s["token"])
 
@@ -143,5 +143,5 @@ if sc.rtm_connect():
 				sendReply(message['channel'], message)
 		time.sleep(1)
 else:
-    logging.info("Connection Failed, invalid token?")
-    
+	logging.info("Connection Failed, invalid token?")
+	
