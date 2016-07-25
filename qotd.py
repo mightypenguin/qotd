@@ -8,9 +8,11 @@ import logging
 import json
 import datetime
 import random
-import slackbot as sb
+import slackbot
 
 logging.basicConfig(format='%(levelname)s:%(message)s', level=logging.INFO)
+
+sb = slackbot.SlackBot()
 
 with file('quotes.json', 'r') as quotesfile:
     quotes = [json.loads(line) for line in quotesfile.readlines()]
@@ -18,14 +20,14 @@ with file('quotes.json', 'r') as quotesfile:
 with file('attributions.csv', 'r') as attributionsfile:
     attributions = [line.strip() for line in attributionsfile.readlines()]
 
-sb.setup()
+#sb.setup()
 
 #Slack formatting
 #*bold* `code` _italic_ ~strike~
 
 
 def addQuote(msg):
-    l = len(botcheck) + 4
+    l = len(sb.botcheck) + 4
     q = {
         'quote': msg['text'][l:].strip('"“'),
         'user': msg['user'],
